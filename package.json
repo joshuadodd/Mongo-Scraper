@@ -1,0 +1,28 @@
+{
+  "name": "mongo-scraper",
+  "version": "1.0.0",
+  "description": "Website Headline Scraper With MongoDB And Mongoose",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joshuadodd/Mongo-Scraper.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joshuadodd/Mongo-Scraper/issues"
+  },
+  "homepage": "https://github.com/joshuadodd/Mongo-Scraper#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "cheerio": "^1.0.0-rc.2",
+    "express": "^4.15.5",
+    "express-handlebars": "^3.0.0",
+    "mongoose": "^4.11.13",
+    "request": "^2.82.0"
+  }
+}
