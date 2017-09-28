@@ -1,47 +1,93 @@
-// Pull in dependencies
+var express = require('express');
+var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
+var cheerio = require('cheerio');
+var request = require('request');
+var Note = require('./models/note.js');
+var Article = require('./models/article.js');
 
-// Snatches HTML from URLs
-var request = require("request");
-// Scrapes the HTML
-var cheerio = require("cheerio");
+mongoose.Promise = Promise;
 
-console.log("___ENTER app.js___");
+var app = express();
 
-// Making a request call for the Onion News homepage
-request("http://www.theonion.com/", function(error, response, html) {
-    if (error) {
-        console.log("ERROR: " + error);
+app.use(bodyParser.urlencoded({
+	extended: false
+}));
 
-    } else {
-        // Load the body of the HTML into cheerio
-        var $ = cheerio.load(html);
+app.use(express.static("public"));
 
-        // Empty array to save our scraped data
-        var numArticles = 0;
-        var scrapeResults = [];
+mongoose.connect("mongodb://localhost/mongoscrape");
+var db = mongoose.connection;
 
-        // With cheerio, find each article tag with the class "summary"
-        $("article.summary").each(function(i, element) {
-            // Article data
-            var title = $(this).find("header").find("a").attr("title");
-            var url = "theonion.com" + $(this).find("a").attr("href");
-            var date = $(this).find("a").attr("data-pubdate");
-            var img = $(this).find("noscript").children("img").attr("src");
-            var description = $(this).find("div.desc").text().trim();
+db.on("error", function(error) {
+	console.log("Mongoose Error: " + error);
+});
 
-            var articleData = {
-                "index": i,
-                "title": title,
-                "description": description,
-                "url": url,
-                "date": date,
-                "img": img
-            };
+db.once("open", function() {
+	console.log("Mongoose connection successful.");
+});
 
-            scrapeResults.push(articleData);
-        });
+// mongoose routes
 
-        // After the program scans all of the articles, log the result
-        console.log(scrapeResults);
-    }
+app.get("/scrape", function(req, res) {
+	request("http://www.nytimes.com", function(error, response, html) {
+		var $ = cheerio.load(html);
+		$('h2.story-heading').each(function(i, element) {
+			var result = {};
+			result.title = $(this).children("a").text();
+			result.link = $(this).children("a").attr("href");
+
+			var entry = new Article(result);
+
+			entry.save(function(err, doc) {
+				if (err) {
+					console.log(err);
+				}
+				else {
+					console.log(doc);
+				}
+			});
+		});
+	});
+	res.send("Scrape complete");
+});
+
+app.get("/articles", function(req, res) {
+	Article.find({}, function(error, doc) {
+		if (error) {
+			console.log(error);
+		}
+		else {
+			res.json(doc);
+		}
+	});
+});
+
+app.get("/articles/:id", function(req, res) {
+	Article.findOne({ "_id": req.params.id })
+	.populate("note")
+	.exec(function(error, doc) {
+		if (error) {
+			console.log(error);
+		}
+		else {
+			res.json(doc);
+		}
+	});
+});
+
+app.post("/articles/:id", function(req, res) {
+	var newNote = new Note(req.body);
+	newNote.save(function(error, doc) {
+		if (err) {
+			console.log(err);
+		}
+		else {
+			res.send(doc);
+		}
+	});
+});
+
+app.listen(3000, function() {
+	console.log("Running on port 3000");
 });
