@@ -7,7 +7,7 @@ body{
     
     #displayNewspaperGif {
     
-        background-image: url("../img/newspaper_cropped.gif");
+        background-image: url("../public/images/newspaper.jpeg");
         color: white;
         height: 250px;
         /*background-color: #cccccc;*/
