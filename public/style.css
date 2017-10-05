@@ -1,16 +1,19 @@
 
 body{
     
-      font-family: 'PT Sans Narrow', sans-serif;
+      font-family: 'PT Sans Narrow', sans-serif
       /*font-family: 'Patua One', cursive;*/
     }
     
-    #displayNewspaperGif {
+    .background {
     
-        background-image: url("../public/images/newspaper.jpeg");
-        color: white;
-        height: 250px;
+      background: url("../images/newspaper.jpeg") no-repeat;
+      background-size: cover;
+        /*color: white;*/
+        height: 50%
+        
         /*background-color: #cccccc;*/
+        
     }
     
     li {
